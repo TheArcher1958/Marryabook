@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:marryabook/Calendar/calendar.dart';
 
 class MBHomePage extends StatefulWidget {
   const MBHomePage({super.key, required this.title});
@@ -66,13 +67,14 @@ class _MBHomePageState extends State<MBHomePage> {
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(Icons.business),
-            label: 'Business',
+
+            icon: Icon(Icons.calendar_today),
+            label: 'Calendar',
           ),
           NavigationDestination(
-            selectedIcon: Icon(Icons.school),
-            icon: Icon(Icons.school_outlined),
-            label: 'School',
+            selectedIcon: Icon(Icons.person),
+            icon: Icon(Icons.person_outline),
+            label: 'People',
           ),
         ],
       ),
@@ -82,11 +84,7 @@ class _MBHomePageState extends State<MBHomePage> {
           alignment: Alignment.center,
           child: const Text('Page 1'),
         ),
-        Container(
-          color: Colors.green,
-          alignment: Alignment.center,
-          child: const Text('Page 2'),
-        ),
+        const MBCalendar(),
         Container(
           color: Colors.blue,
           alignment: Alignment.center,
