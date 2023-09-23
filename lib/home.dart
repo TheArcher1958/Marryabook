@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:marryabook/Calendar/calendar.dart';
+import 'package:marryabook/Calendar/CalendarView.dart';
+import 'package:marryabook/People/PeopleListView.dart';
 
 class MBHomePage extends StatefulWidget {
   const MBHomePage({super.key, required this.title});
@@ -85,11 +86,7 @@ class _MBHomePageState extends State<MBHomePage> {
           child: const Text('Page 1'),
         ),
         const MBCalendar(),
-        Container(
-          color: Colors.blue,
-          alignment: Alignment.center,
-          child: const Text('Page 3'),
-        ),
+        const PeopleListView(),
       ][currentPageIndex],
     );
   }

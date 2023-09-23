@@ -9,13 +9,27 @@ class MBCalendar extends StatefulWidget {
 }
 
 class _MBCalendarState extends State<MBCalendar> {
+  final CalendarController _controller = CalendarController();
+
+  void calendarTapped(CalendarTapDetails calendarTapDetails) {  if (_controller.view == CalendarView.month &&      calendarTapDetails.targetElement == CalendarElement.calendarCell) {    _controller.view = CalendarView.day;  } else if ((_controller.view == CalendarView.week ||          _controller.view == CalendarView.workWeek) &&      calendarTapDetails.targetElement == CalendarElement.viewHeader) {    _controller.view = CalendarView.day;  }}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SfCalendar(
-        view: CalendarView.week,
+        showDatePickerButton: true,
+        showTodayButton: true,
+        view: CalendarView.day,
+        allowedViews: const [
+          CalendarView.day,
+          CalendarView.week,
+          CalendarView.month,
+        ],
+        controller: _controller,
+        onTap: calendarTapped,
         dataSource: _getCalendarDataSource(),
-        allowDragAndDrop: true
+        allowDragAndDrop: true,
+
       )
     );
   }
