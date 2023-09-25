@@ -1,10 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:marryabook/Models/PersonModel.dart';
 import 'package:marryabook/Firebase/FirebasePeopleController.dart';
 import 'package:marryabook/People/CreatePersonView.dart';
+import 'package:marryabook/People/PersonDetailView.dart';
+
+import '../Models/UserModel.dart';
 
 class PeopleListView extends StatefulWidget {
-  const PeopleListView({super.key});
+  const PeopleListView({super.key, required this.user});
+  final User user;
 
   @override
   State<PeopleListView> createState() => _PeopleListViewState();
@@ -12,55 +17,69 @@ class PeopleListView extends StatefulWidget {
 
 class _PeopleListViewState extends State<PeopleListView> {
 
+  final _usersStream = users.doc("CEjAxcZrJgY1K5wJaSqC").collection('people').snapshots();
+
   @override
   void initState() {
     // getUser("CEjAxcZrJgY1K5wJaSqC");
+    print(widget.user);
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<QuerySnapshot>(
-        future: users.doc("CEjAxcZrJgY1K5wJaSqC").collection('people').get(),
+      body:
+        StreamBuilder<QuerySnapshot>(
+        stream: _usersStream,
+        // future: ,
         builder:
             (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
 
           if (snapshot.hasError) {
-            return const Text("Something went wrong");
+            return Text('Something went wrong');
           }
 
-          if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
-            return const Text("Document does not exist");
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Text("Loading");
           }
 
-          if (snapshot.connectionState == ConnectionState.done) {
+
             // Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
             // return Text("Name: ${data['name']} ${data['ap']}");
-            return ListView(
-              children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                Map<String, dynamic> people = document.data()! as Map<String, dynamic>;
-                return ListTile(
-                  title: Text(people['name']),
-                  subtitle: Text(people?['description']),
-                );
-              }).toList(),
-            );
-          }
+          return ListView(
+            children: snapshot.data!.docs.map((DocumentSnapshot document) {
+              Map<String, dynamic> people = document.data()! as Map<String, dynamic>;
+              return ListTile(
+                leading: const Icon(Icons.circle, color: Colors.green,),
+                title: Text(people['name']),
+                subtitle: Text(people['description']),
+                onTap: () {
+                  print(people.toString());
+                  print(document.reference.id);
+                  Navigator.push(
+                    context,
+                      MaterialPageRoute(builder: (context) => PersonDetailView(
+                          person: Person(name: people['name'],id: document.reference.id, parentUser: widget.user)
+                      ))
+                  );
+                },
+              );
+            }).toList(),
+          );
 
-          return const Text("loading");
+
+
         }
       ),
       floatingActionButton: FloatingActionButton(
-        // When the user presses the button, show an alert dialog containing
-        // the text that the user has entered into the text field.
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const CreatePersonView()),
           );
         },
-        tooltip: 'Show me the value!',
-        child: const Icon(Icons.text_fields),
+        tooltip: 'Create a Person',
+        child: const Icon(Icons.add),
       ),
     );
   }

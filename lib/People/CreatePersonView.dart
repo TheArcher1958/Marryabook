@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../Models/PersonModel.dart';
 
 class CreatePersonView extends StatefulWidget {
   const CreatePersonView({super.key});
+
 
   @override
   State<CreatePersonView> createState() => _CreatePersonViewState();

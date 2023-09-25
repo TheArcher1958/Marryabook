@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:marryabook/Models/UserModel.dart';
 import 'package:marryabook/Calendar/CalendarView.dart';
 import 'package:marryabook/People/PeopleListView.dart';
 
@@ -86,7 +87,7 @@ class _MBHomePageState extends State<MBHomePage> {
           child: const Text('Page 1'),
         ),
         const MBCalendar(),
-        const PeopleListView(),
+        PeopleListView(user: User("Josh","Test@google.com","CEjAxcZrJgY1K5wJaSqC")),
       ][currentPageIndex],
     );
   }
