@@ -22,11 +22,14 @@ class _CreatePersonViewState extends State<CreatePersonView> {
   }
 
   Future<void> addUser() {
+    print(PersonStatus(Colors.yellow, Icons.circle).toJson());
     // Call the user's CollectionReference to add a new user
     return people
         .add({
       'name': myController.text,
-      'description': 'The weird kid from high school'
+      'parentUser': "CEjAxcZrJgY1K5wJaSqC",
+      'description': 'The weird kid from high school',
+      'status': PersonStatus(Colors.yellow, Icons.circle).toJson()
     })
         .then((value) => print("person Added"))
         .catchError((error) => print("Failed to add user: $error"));

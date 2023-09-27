@@ -36,12 +36,12 @@ class _PersonDetailViewState extends State<PersonDetailView> {
                     child: Text("Delete ${widget.person.name}"),
                   ),
 
-                  PopupMenuItem<int>(
+                  const PopupMenuItem<int>(
                     value: 1,
                     child: Text("Settings"),
                   ),
 
-                  PopupMenuItem<int>(
+                  const PopupMenuItem<int>(
                     value: 2,
                     child: Text("Logout"),
                   ),
@@ -68,10 +68,8 @@ class _PersonDetailViewState extends State<PersonDetailView> {
         backgroundColor: Colors.deepPurpleAccent,
         title: Text(widget.person.name)
       ),
-      body: Container(
-        child: Center(
-          child: Text(widget.person.id),
-        ),
+      body: Center(
+        child: Text(widget.person.id),
       ),
     );
   }

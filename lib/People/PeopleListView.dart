@@ -4,6 +4,7 @@ import 'package:marryabook/Models/PersonModel.dart';
 import 'package:marryabook/Firebase/FirebasePeopleController.dart';
 import 'package:marryabook/People/CreatePersonView.dart';
 import 'package:marryabook/People/PersonDetailView.dart';
+import 'package:marryabook/People/PersonListTile.dart';
 
 import '../Models/UserModel.dart';
 
@@ -49,21 +50,8 @@ class _PeopleListViewState extends State<PeopleListView> {
           return ListView(
             children: snapshot.data!.docs.map((DocumentSnapshot document) {
               Map<String, dynamic> people = document.data()! as Map<String, dynamic>;
-              return ListTile(
-                leading: const Icon(Icons.circle, color: Colors.green,),
-                title: Text(people['name']),
-                subtitle: Text(people['description']),
-                onTap: () {
-                  print(people.toString());
-                  print(document.reference.id);
-                  Navigator.push(
-                    context,
-                      MaterialPageRoute(builder: (context) => PersonDetailView(
-                          person: Person(name: people['name'],id: document.reference.id, parentUser: widget.user)
-                      ))
-                  );
-                },
-              );
+              Person personObj = Person.fromFirestore(people, document.reference.id);
+              return PersonListTile(person: personObj);
             }).toList(),
           );
 
