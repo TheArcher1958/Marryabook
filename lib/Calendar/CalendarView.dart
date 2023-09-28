@@ -36,6 +36,8 @@ class _MBCalendarState extends State<MBCalendar> {
 
 
   void calendarTapped(CalendarTapDetails calendarTapDetails) {
+    print('\n\n\n\n');
+    print(calendarTapDetails.targetElement);
     if (_controller.view == CalendarView.month &&
         calendarTapDetails.targetElement == CalendarElement.calendarCell) {
       _controller.view = CalendarView.day;
@@ -44,6 +46,9 @@ class _MBCalendarState extends State<MBCalendar> {
             _controller.view == CalendarView.workWeek) &&
         calendarTapDetails.targetElement == CalendarElement.viewHeader) {
       _controller.view = CalendarView.day;
+      return;
+    } else if (calendarTapDetails.targetElement == CalendarElement.header) {
+      print('tapped header');
       return;
     }
 
