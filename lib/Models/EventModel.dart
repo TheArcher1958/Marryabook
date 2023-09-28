@@ -11,16 +11,23 @@ class Event {
         this.startTimeZone = '',
         this.endTimeZone = '',
         this.description = '',
-        required this.ids
+        required this.ids,
+
+
+        // this.exceptionDates,
+        // this.recurrenceRule,
+        // this.recurrenceId,
+        // this.background,
+        this.eventId = '',
       });
 
   factory Event.fromFirestore(Map<dynamic, dynamic> json, id) {
-    print(json.toString());
     return Event(
         from: DateTime.parse(json['startTime'].toDate().toString()),
         to: DateTime.parse(json['endTime'].toDate().toString()),
         isAllDay: json['isAllDay'] ?? false,
         eventName: json['name'],
+        eventId: id,
         description: json['description'] ?? '',
         parentUser: json['parentUser'] ?? '',
         ids: json['addedPeople'] ?? [],
@@ -40,6 +47,7 @@ class Event {
     "parentUser": parentUser,
   };
 
+
   final String eventName;
   final DateTime from;
   final DateTime to;
@@ -48,9 +56,16 @@ class Event {
   final bool isAllDay;
   final String startTimeZone;
   final String endTimeZone;
-
   final String description;
   final List<dynamic> ids;
+
+  // Color? background;
+  // Object? recurrenceId;
+  // String? fromZone;
+  // String? toZone;
+  // String? recurrenceRule;
+  // List<DateTime>? exceptionDates;
+  String eventId;
 }
 
 enum EventType {

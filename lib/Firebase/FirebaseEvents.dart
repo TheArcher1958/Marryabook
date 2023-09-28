@@ -4,8 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 CollectionReference events = FirebaseFirestore.instance.collection('user').doc("CEjAxcZrJgY1K5wJaSqC").collection('events');
 
 Future<void> addEvent(Event event) {
-  print(event.color);
-  print(event.toJson());
+
   // Call the event's CollectionReference to add a new event
   return events
       .add({
@@ -22,5 +21,16 @@ Future<void> addEvent(Event event) {
   })
       .then((value) => print("event Added"))
       .catchError((error) => print("Failed to add event: $error"));
+}
+
+
+CollectionReference eventDoc = FirebaseFirestore.instance.collection('user').doc("CEjAxcZrJgY1K5wJaSqC").collection('events');
+
+Future<void> updateEvent(event) {
+  return eventDoc
+      .doc(event.id)
+      .update({'startTime': event.from, 'endTime': event.to})
+      .then((value) => print("Event Updated"))
+      .catchError((error) => print("Failed to update event: $error"));
 }
 

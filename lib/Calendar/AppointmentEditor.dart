@@ -1,36 +1,44 @@
 import 'dart:math';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:flutter/material.dart';
-import 'package:marryabook/Firebase/FirebasEvents.dart';
+import 'package:marryabook/Firebase/FirebaseEvents.dart';
 import 'package:marryabook/Models/EventModel.dart';
 
 import '../Models/PersonModel.dart';
 
 class AppointmentEditor extends StatefulWidget {
-  AppointmentEditor({super.key, required this.startDate});
-  DateTime startDate;
+  AppointmentEditor({super.key, required this.newEvent});
+  Event newEvent;
 
   @override
   AppointmentEditorState createState() => AppointmentEditorState();
 }
 
 class AppointmentEditorState extends State<AppointmentEditor> {
-  String eventName = "";
-  Color eventColor = Colors.blue;
-  DateTime endDate = DateTime.now();
-  String eventDescription = "";
-  bool isAllDay = false;
+  late String eventName = widget.newEvent.eventName;
+  late Color eventColor = Color(widget.newEvent.color);
+  late DateTime endDate = widget.newEvent.to;
+  late DateTime startDate = widget.newEvent.from;
+  late String eventDescription = widget.newEvent.description;
+  late bool isAllDay = widget.newEvent.isAllDay;
   EventType eventType = EventType.other;
   List<Person> addedPeople = [];
   Event? _selectedAppointment;
   List<Event> events = [];
-  TimeOfDay endTime = TimeOfDay.now();
-  TimeOfDay startTime = TimeOfDay.now();
+
+  // DateTime startDate = widget.newEvent.from;
+  // DateTime endDate = startDate.add(const Duration(minutes: 60));
+  late TimeOfDay endTime = TimeOfDay.fromDateTime(startDate.add(const Duration(minutes: 60)));
+  late TimeOfDay startTime = TimeOfDay.fromDateTime(startDate);
+
+  // TimeOfDay endTime = TimeOfDay.now();
+  // TimeOfDay startTime = TimeOfDay.now();
 
 
   @override
   void initState() {
-    endDate = widget.startDate.add(const Duration(minutes: 60));
+    // startDate = widget.newEvent.from;
+    // endDate = widget.newEvent.from.add(const Duration(minutes: 60));
     // _addResourceDetails();
     // _employeeCollection = <CalendarResource>[];
     // _addResources();
@@ -56,11 +64,12 @@ class AppointmentEditorState extends State<AppointmentEditor> {
   // }
 
 
+
   Widget _getAppointmentEditor(BuildContext context) {
-    endTime = TimeOfDay.fromDateTime(widget.startDate.subtract(const Duration(minutes: 60)));
-    // endTime = widget.startDate.subtract(const Duration(minutes: 60)) as TimeOfDay;
-    startTime = TimeOfDay.fromDateTime(widget.startDate);
-    // DateTime endDate = widget.startDate.add(const Duration(minutes: 60));
+    print(widget.newEvent.toJson());
+    print(eventName);
+
+    // DateTime endDate = startDate.add(const Duration(minutes: 60));
     return Container(
         color: Colors.white,
         child: ListView(
@@ -123,28 +132,28 @@ class AppointmentEditorState extends State<AppointmentEditor> {
                         child: GestureDetector(
                             child: Text(
                                 DateFormat('EEE, MMM dd yyyy')
-                                    .format(widget.startDate),
+                                    .format(startDate),
                                 textAlign: TextAlign.left),
                             onTap: () async {
                               final DateTime? date = await showDatePicker(
                                 context: context,
-                                initialDate: widget.startDate,
+                                initialDate: startDate,
                                 firstDate: DateTime(1900),
                                 lastDate: DateTime(2100),
                               );
 
-                              if (date != null && date != widget.startDate) {
+                              if (date != null && date != startDate) {
                                 setState(() {
                                   final Duration difference =
-                                  endDate.difference(widget.startDate);
-                                  widget.startDate = DateTime(
+                                  endDate.difference(startDate);
+                                  startDate = DateTime(
                                       date.year,
                                       date.month,
                                       date.day,
-                                      widget.startDate.hour,
-                                      widget.startDate.minute,
+                                      startDate.hour,
+                                      startDate.minute,
                                       0);
-                                  endDate = widget.startDate.add(difference);
+                                  endDate = startDate.add(difference);
                                   endTime = TimeOfDay(
                                       hour: endDate.hour,
                                       minute: endDate.minute);
@@ -158,27 +167,27 @@ class AppointmentEditorState extends State<AppointmentEditor> {
                               ? const Text('')
                               : GestureDetector(
                               child: Text(
-                                DateFormat('hh:mm a').format(widget.startDate),
+                                DateFormat('hh:mm a').format(startDate),
                                 textAlign: TextAlign.right,
                               ),
                               onTap: () async {
                                 final TimeOfDay? time = await showTimePicker(
                                     context: context,
-                                    initialTime: TimeOfDay.fromDateTime(widget.startDate));
+                                    initialTime: TimeOfDay.fromDateTime(startDate));
 
-                                if (time != null && time != widget.startDate) {
+                                if (time != null && time != startDate) {
                                   setState(() {
                                     startTime = time;
                                     final Duration difference =
-                                    endDate.difference(widget.startDate);
-                                    widget.startDate = DateTime(
-                                        widget.startDate.year,
-                                        widget.startDate.month,
-                                        widget.startDate.day,
-                                        widget.startDate.hour,
-                                        widget.startDate.minute,
+                                    endDate.difference(startDate);
+                                    startDate = DateTime(
+                                        startDate.year,
+                                        startDate.month,
+                                        startDate.day,
+                                        startDate.hour,
+                                        startDate.minute,
                                         0);
-                                    endDate = widget.startDate.add(difference);
+                                    endDate = startDate.add(difference);
                                     endTime = TimeOfDay(
                                         hour: endDate.hour,
                                         minute: endDate.minute);
@@ -210,7 +219,7 @@ class AppointmentEditorState extends State<AppointmentEditor> {
                               if (date != null && date != endDate) {
                                 setState(() {
                                   final Duration difference =
-                                  endDate.difference(widget.startDate);
+                                  endDate.difference(startDate);
                                   endDate = DateTime(
                                       date.year,
                                       date.month,
@@ -218,11 +227,11 @@ class AppointmentEditorState extends State<AppointmentEditor> {
                                       endTime.hour,
                                       endDate.minute,
                                       0);
-                                  if (endDate.isBefore(widget.startDate)) {
-                                    widget.startDate = endDate.subtract(difference);
+                                  if (endDate.isBefore(startDate)) {
+                                    startDate = endDate.subtract(difference);
                                     startTime = TimeOfDay(
-                                        hour: widget.startDate.hour,
-                                        minute: widget.startDate.minute);
+                                        hour: startDate.hour,
+                                        minute: startDate.minute);
                                   }
                                 });
                               }
@@ -246,7 +255,7 @@ class AppointmentEditorState extends State<AppointmentEditor> {
                                   setState(() {
                                     endTime = time;
                                     final Duration difference =
-                                    endDate.difference(widget.startDate);
+                                    endDate.difference(startDate);
                                     endDate = DateTime(
                                         endDate.year,
                                         endDate.month,
@@ -254,12 +263,12 @@ class AppointmentEditorState extends State<AppointmentEditor> {
                                         endTime.hour,
                                         endTime.minute,
                                         0);
-                                    if (endDate.isBefore(widget.startDate)) {
-                                      widget.startDate =
+                                    if (endDate.isBefore(startDate)) {
+                                      startDate =
                                           endDate.subtract(difference);
                                       startTime= TimeOfDay(
-                                          hour: widget.startDate.hour,
-                                          minute: widget.startDate.minute);
+                                          hour: startDate.hour,
+                                          minute: startDate.minute);
                                     }
                                   });
                                 }
@@ -394,8 +403,12 @@ class AppointmentEditorState extends State<AppointmentEditor> {
                         // events.notifyListeners(CalendarDataSourceAction.remove,
                         //     <Event>[]..add(_selectedAppointment!));
                       }
+
+                      DateTime startDate = widget.newEvent.from;
+                      DateTime endDate = startDate.add(const Duration(minutes: 60));
+
                       events.add(Event(
-                          from: widget.startDate,
+                          from: startDate,
                           to: endDate,
                           color: Colors.blue.value,
                           parentUser: 'tim',

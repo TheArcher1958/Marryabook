@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:marryabook/Firebase/FirebaseEvents.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:marryabook/Calendar/AppointmentEditor.dart';
 import 'package:marryabook/Models/EventModel.dart';
@@ -10,6 +11,39 @@ class MBCalendar extends StatefulWidget {
   @override
   State<MBCalendar> createState() => _MBCalendarState();
 }
+
+
+
+
+
+class Meeting {
+  Meeting(
+      {required this.from,
+        required this.to,
+        this.id,
+        this.recurrenceId,
+        this.eventName = '',
+        this.isAllDay = false,
+        this.background,
+        this.exceptionDates,
+        this.recurrenceRule});
+
+  DateTime from;
+  DateTime to;
+  Object? id;
+  Object? recurrenceId;
+  String eventName;
+  bool isAllDay;
+  Color? background;
+  String? fromZone;
+  String? toZone;
+  String? recurrenceRule;
+  List<DateTime>? exceptionDates;
+}
+
+
+
+
 
 class _MBCalendarState extends State<MBCalendar> {
   final Stream<QuerySnapshot> _userEventsStream = FirebaseFirestore.instance.collection('user').doc("CEjAxcZrJgY1K5wJaSqC").collection('events').snapshots();
@@ -24,6 +58,7 @@ class _MBCalendarState extends State<MBCalendar> {
   late DateTime _endDate;
   late TimeOfDay _endTime;
   late bool _isAllDay;
+  late Color _color;
   String _subject = '';
   String _notes = '';
   // late List<CalendarResource> _employeeCollection;
@@ -58,13 +93,16 @@ class _MBCalendarState extends State<MBCalendar> {
     _subject = '';
     _notes = '';
 
-
+    Event newEvent;
     if (calendarTapDetails.appointments != null &&
         calendarTapDetails.appointments?.length == 1) {
       final Event meetingDetails = calendarTapDetails.appointments![0];
+      print('event tapped!');
+      print(meetingDetails);
       _startDate = meetingDetails.from;
       _endDate = meetingDetails.to;
       _isAllDay = meetingDetails.isAllDay;
+      _color = Color(meetingDetails.color);
       // _selectedColorIndex = _colorCollection.indexOf(meetingDetails.background);
       // _selectedTimeZoneIndex = meetingDetails.startTimeZone == ''
       //     ? 0
@@ -76,16 +114,20 @@ class _MBCalendarState extends State<MBCalendar> {
       // _selectedResourceIndex =
       //     _nameCollection.indexOf(calendarTapDetails.resource!.displayName);
       _selectedAppointment = meetingDetails;
+      newEvent = Event(eventName: _subject, from: _startDate, to: _endDate, isAllDay: _isAllDay, color: Colors.red.value, parentUser: "Fred", ids: []);
     } else {
       final DateTime date = calendarTapDetails.date!;
       _startDate = date;
       _endDate = date.add(const Duration(hours: 1));
+      _startTime = TimeOfDay(hour: _startDate.hour, minute: _startDate.minute);
+      _endTime = TimeOfDay(hour: _endDate.hour, minute: _endDate.minute);
+      // _startDate = DateTime(_startDate.year, _startDate.month, _startDate.day, _startDate.hour, _startDate.minute);
+      newEvent = Event(from: _startDate, to: _endDate, color: Colors.red.value, parentUser: "Fred", ids: []);
     }
-    _startTime = TimeOfDay(hour: _startDate.hour, minute: _startDate.minute);
-    _endTime = TimeOfDay(hour: _endDate.hour, minute: _endDate.minute);
+
     Navigator.push<Widget>(
       context,
-      MaterialPageRoute(builder: (BuildContext context) => AppointmentEditor(startDate: _startDate)),
+      MaterialPageRoute(builder: (BuildContext context) => AppointmentEditor(newEvent: newEvent)),
     );
   }
 
@@ -113,30 +155,50 @@ class _MBCalendarState extends State<MBCalendar> {
             onTap: calendarTapped,
             dataSource: _getCalendarDataSource(snapshot),
             allowDragAndDrop: true,
+            onDragStart: dragStart,
+            onDragEnd: dragEnd,
+            onDragUpdate: dragUpdate,
 
           )
         );
       }
     );
   }
+
 }
 
 
 _AppointmentDataSource _getCalendarDataSource(snapshot) {
   List<Event> events = <Event>[];
-  print(snapshot.data);
-  print(snapshot.data!.docs);
-  snapshot.data!.docs.forEach((document) {
-    Map<String, dynamic> fireEvent = document.data()! as Map<String, dynamic>;
-    print(fireEvent);
-    events.add(Event.fromFirestore(fireEvent, document.reference.id));
-  });
-
+  if (snapshot.data != null) {
+    snapshot.data!.docs.forEach((document) {
+      Map<String, dynamic> fireEvent = document.data()! as Map<String, dynamic>;
+      // print(fireEvent);
+      events.add(Event.fromFirestore(fireEvent, document.reference.id));
+    });
+  }
 
   return _AppointmentDataSource(events);
+
+
 }
 
-class _AppointmentDataSource extends CalendarDataSource {
+
+void dragStart(AppointmentDragStartDetails appointmentDragStartDetails) {
+
+}
+
+void dragEnd(AppointmentDragEndDetails appointmentDragEndDetails) {
+
+  updateEvent(appointmentDragEndDetails.appointment);
+}
+
+
+void dragUpdate(AppointmentDragUpdateDetails appointmentDragUpdateDetails) {
+
+}
+
+class _AppointmentDataSource extends CalendarDataSource<Event> {
   _AppointmentDataSource(List<Event> source){
     appointments = source;
   }
@@ -160,18 +222,76 @@ class _AppointmentDataSource extends CalendarDataSource {
     return appointments![index].eventName;
   }
 
-  @override
-  String getStartTimeZone(int index) {
-    return appointments![index].startTimeZone;
-  }
-
-  @override
-  String getEndTimeZone(int index) {
-    return appointments![index].endTimeZone;
-  }
+  // @override
+  // String getStartTimeZone(int index) {
+  //   return appointments![index].startTimeZone;
+  // }
+  //
+  // @override
+  // String getEndTimeZone(int index) {
+  //   return appointments![index].endTimeZone;
+  // }
 
   @override
   Color getColor(int index) {
     return Color(appointments![index].color);
+  }
+
+  // @override
+  // List<DateTime>? getRecurrenceExceptionDates(int index) {
+  //   return appointments![index].exceptionDates as List<DateTime>?;
+  // }
+
+  // @override
+  // String? getRecurrenceRule(int index) {
+  //   return appointments![index].recurrenceRule;
+  // }
+
+  // @override
+  // Object? getRecurrenceId(int index) {
+  //   return appointments![index].recurrenceId as Object?;
+  // }
+
+  // @override
+  // Object? getId(int index) {
+  //   return appointments![index].id;
+  // }
+
+
+
+
+
+  // @override
+  // Meeting convertAppointmentToObject(
+  //     Meeting customData, Appointment appointment) {
+  //   return Meeting(
+  //       from: appointment.startTime,
+  //       to: appointment.endTime,
+  //       content: appointment.subject,
+  //       background: appointment.color,
+  //       isAllDay: appointment.isAllDay);
+  // }
+
+
+  @override
+  Event convertAppointmentToObject(
+      Event customData, Appointment appointment) {
+    // TODO: implement convertAppointmentToObject
+    return Event(
+        from: appointment.startTime,
+        to: appointment.endTime,
+        eventName: appointment.subject,
+        color: appointment.color.value,
+        isAllDay: appointment.isAllDay,
+        ids: [],
+        // id: appointments.id,
+        eventId: customData.eventId,
+        parentUser: 'Test User',
+        // recurrenceRule: appointment.recurrenceRule,
+        // recurrenceId: appointment.recurrenceId,
+        // exceptionDates: appointment.recurrenceExceptionDates,
+
+
+      );
   }
 }
