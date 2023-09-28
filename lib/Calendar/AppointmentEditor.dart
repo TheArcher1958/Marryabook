@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:flutter/material.dart';
-import 'package:marryabook/Firebase/FirebaseAddEvent.dart';
+import 'package:marryabook/Firebase/FirebasEvents.dart';
 import 'package:marryabook/Models/EventModel.dart';
 
 import '../Models/PersonModel.dart';

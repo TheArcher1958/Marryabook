@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:marryabook/Calendar/AppointmentEditor.dart';
@@ -11,7 +12,7 @@ class MBCalendar extends StatefulWidget {
 }
 
 class _MBCalendarState extends State<MBCalendar> {
-
+  final Stream<QuerySnapshot> _userEventsStream = FirebaseFirestore.instance.collection('user').doc("CEjAxcZrJgY1K5wJaSqC").collection('events').snapshots();
   // late List<Color> _colorCollection;
   // late List<String> _colorNames;
   // int _selectedColorIndex = 0;
@@ -89,52 +90,83 @@ class _MBCalendarState extends State<MBCalendar> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SfCalendar(
-        showDatePickerButton: true,
-        showTodayButton: true,
-        view: CalendarView.day,
-        allowedViews: const [
-          CalendarView.day,
-          CalendarView.week,
-          CalendarView.month,
-        ],
-        controller: _controller,
-        onTap: calendarTapped,
-        dataSource: _getCalendarDataSource(),
-        allowDragAndDrop: true,
+    return StreamBuilder(
+      stream: _userEventsStream,
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
 
-      )
+        return Scaffold(
+          body: SfCalendar(
+            showDatePickerButton: true,
+            showTodayButton: true,
+            view: CalendarView.day,
+            allowedViews: const [
+              CalendarView.day,
+              CalendarView.week,
+              CalendarView.month,
+            ],
+            controller: _controller,
+            onTap: calendarTapped,
+            dataSource: _getCalendarDataSource(snapshot),
+            allowDragAndDrop: true,
+
+          )
+        );
+      }
     );
   }
 }
 
 
-_AppointmentDataSource _getCalendarDataSource() {
-  List<Appointment> appointments = <Appointment>[];
-  appointments.add(Appointment(
-    startTime: DateTime.now(),
-    endTime: DateTime.now().add(const Duration(minutes: 60)),
-    subject: 'Travel',
-    color: Colors.blue,
-    startTimeZone: '',
-    endTimeZone: '',
-  ));
+_AppointmentDataSource _getCalendarDataSource(snapshot) {
+  List<Event> events = <Event>[];
+  print(snapshot.data);
+  print(snapshot.data!.docs);
+  snapshot.data!.docs.forEach((document) {
+    Map<String, dynamic> fireEvent = document.data()! as Map<String, dynamic>;
+    print(fireEvent);
+    events.add(Event.fromFirestore(fireEvent, document.reference.id));
+  });
 
-  appointments.add(Appointment(
-    startTime: DateTime.now().subtract(const Duration(minutes: 60)),
-    endTime: DateTime.now().add(const Duration(minutes: 30)),
-    subject: 'Meeting',
-    color: Colors.red,
-    startTimeZone: '',
-    endTimeZone: '',
-  ));
 
-  return _AppointmentDataSource(appointments);
+  return _AppointmentDataSource(events);
 }
 
 class _AppointmentDataSource extends CalendarDataSource {
-  _AppointmentDataSource(List<Appointment> source){
+  _AppointmentDataSource(List<Event> source){
     appointments = source;
+  }
+  @override
+  DateTime getStartTime(int index) {
+    return appointments![index].from;
+  }
+
+  @override
+  DateTime getEndTime(int index) {
+    return appointments![index].to;
+  }
+
+  @override
+  bool isAllDay(int index) {
+    return appointments![index].isAllDay;
+  }
+
+  @override
+  String getSubject(int index) {
+    return appointments![index].eventName;
+  }
+
+  @override
+  String getStartTimeZone(int index) {
+    return appointments![index].startTimeZone;
+  }
+
+  @override
+  String getEndTimeZone(int index) {
+    return appointments![index].endTimeZone;
+  }
+
+  @override
+  Color getColor(int index) {
+    return Color(appointments![index].color);
   }
 }

@@ -14,6 +14,8 @@ Future<void> addEvent(Event event) {
     'endTime': event.to,
     'color': event.color,
     'isAllDay': event.isAllDay,
+    'startTimeZone': 'Central America Standard Time',
+    'endTimeZone': 'Central America Standard Time',
     'addedPeople': event.ids,
     'parentUser': "CEjAxcZrJgY1K5wJaSqC",
     'description': event.description,
@@ -21,3 +23,4 @@ Future<void> addEvent(Event event) {
       .then((value) => print("event Added"))
       .catchError((error) => print("Failed to add event: $error"));
 }
+
