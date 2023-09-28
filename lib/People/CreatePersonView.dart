@@ -1,3 +1,5 @@
+// import 'dart:js_util';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../Models/PersonModel.dart';
@@ -11,24 +13,27 @@ class CreatePersonView extends StatefulWidget {
 }
 
 class _CreatePersonViewState extends State<CreatePersonView> {
-  final myController = TextEditingController();
+  final nameController = TextEditingController();
+  final notesController = TextEditingController();
   CollectionReference people = FirebaseFirestore.instance.collection('user').doc("CEjAxcZrJgY1K5wJaSqC").collection('people');
 
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
-    myController.dispose();
+    nameController.dispose();
+    notesController.dispose();
     super.dispose();
   }
+
 
   Future<void> addUser() {
     print(PersonStatus(Colors.yellow, Icons.circle).toJson());
     // Call the user's CollectionReference to add a new user
     return people
         .add({
-      'name': myController.text,
+      'name': nameController.text,
       'parentUser': "CEjAxcZrJgY1K5wJaSqC",
-      'description': 'The weird kid from high school',
+      'description': notesController.text,
       'status': PersonStatus(Colors.yellow, Icons.circle).toJson()
     })
         .then((value) => print("person Added"))
@@ -39,30 +44,48 @@ class _CreatePersonViewState extends State<CreatePersonView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(onPressed: () {
+            addUser();
+            Navigator.pop(context);
+          }, icon: const Icon(Icons.check))
+        ],
+      ),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: TextField(
-              controller: myController,
+              controller: nameController,
               decoration: const InputDecoration(
                 border: UnderlineInputBorder(),
-                labelText: 'Enter your name',
+                labelText: 'Name',
               ),
             ),
           ),
 
-          FloatingActionButton(
-            // When the user presses the button, show an alert dialog containing
-            // the text that the user has entered into the text field.
-            onPressed: () {
-
-              addUser();
-              Navigator.pop(context);
-            },
-            tooltip: 'Show me the value!',
-            child: const Icon(Icons.text_fields),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+            child: TextField(
+              controller: notesController,
+              decoration: const InputDecoration(
+                border: UnderlineInputBorder(),
+                labelText: 'Notes',
+              ),
+            ),
           ),
+
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+          //   child: TextField(
+          //     controller: myController,
+          //     decoration: const InputDecoration(
+          //       border: UnderlineInputBorder(),
+          //       labelText: 'Enter your name',
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

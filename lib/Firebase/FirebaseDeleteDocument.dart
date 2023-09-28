@@ -25,7 +25,8 @@ Future<FirebaseResponseObject?> deleteDocument(object) async {
 
 Future<FirebaseResponseObject> deletePerson(person) async {
   try {
-    DocumentReference documentRef = FirebaseFirestore.instance.collection('user').doc(person.parentUser.id).collection('people').doc(person.id);
+    print(person);
+    DocumentReference documentRef = FirebaseFirestore.instance.collection('user').doc(person.parentUser).collection('people').doc(person.id);
     var deletion = documentRef.delete();
     print(deletion);
     return FirebaseResponseObject('Success', 'Deletion was a success!');
