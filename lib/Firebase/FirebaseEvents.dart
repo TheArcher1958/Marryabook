@@ -15,7 +15,7 @@ Future<void> addEvent(Event event) {
     'isAllDay': event.isAllDay,
     'startTimeZone': 'Central America Standard Time',
     'endTimeZone': 'Central America Standard Time',
-    'addedPeople': event.ids,
+    'ids': event.ids,
     'parentUser': "CEjAxcZrJgY1K5wJaSqC",
     'description': event.description,
   })

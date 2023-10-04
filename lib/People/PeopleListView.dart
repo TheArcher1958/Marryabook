@@ -5,6 +5,7 @@ import 'package:marryabook/Firebase/FirebasePeopleController.dart';
 import 'package:marryabook/People/CreatePersonView.dart';
 import 'package:marryabook/People/PersonDetailView.dart';
 import 'package:marryabook/People/PersonListTile.dart';
+import 'package:marryabook/global.dart';
 
 import '../Models/UserModel.dart';
 
@@ -51,6 +52,7 @@ class _PeopleListViewState extends State<PeopleListView> {
             children: snapshot.data!.docs.map((DocumentSnapshot document) {
               Map<String, dynamic> people = document.data()! as Map<String, dynamic>;
               Person personObj = Person.fromFirestore(people, document.reference.id);
+              personList.add(personObj);
               return PersonListTile(person: personObj);
             }).toList(),
           );

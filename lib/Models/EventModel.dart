@@ -11,7 +11,7 @@ class Event {
         this.startTimeZone = '',
         this.endTimeZone = '',
         this.description = '',
-        required this.ids,
+        this.ids,
 
 
         // this.exceptionDates,
@@ -30,7 +30,7 @@ class Event {
         eventId: id,
         description: json['description'] ?? '',
         parentUser: json['parentUser'] ?? '',
-        ids: json['addedPeople'] ?? [],
+        ids: json['ids'],
         color: json['color'],
     );
   }
@@ -39,6 +39,7 @@ class Event {
     'startTime': from,
     'endTime': to,
     'color': color,
+    'ids': ids,
     'isAllDay': isAllDay,
     'startTimeZone': 'Central America Standard Time',
     'endTimeZone': 'Central America Standard Time',
@@ -48,16 +49,16 @@ class Event {
   };
 
 
-  final String eventName;
+  String eventName;
   final DateTime from;
   final DateTime to;
   final String parentUser;
-  final int color;
-  final bool isAllDay;
+  int color;
+  bool isAllDay;
   final String startTimeZone;
   final String endTimeZone;
-  final String description;
-  final List<dynamic> ids;
+  String description;
+  List<dynamic>? ids;
 
   // Color? background;
   // Object? recurrenceId;

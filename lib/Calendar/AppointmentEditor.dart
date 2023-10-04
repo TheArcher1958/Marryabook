@@ -1,10 +1,12 @@
 import 'dart:math';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:flutter/material.dart';
+import 'package:marryabook/Calendar/PersonPickerWidget.dart';
 import 'package:marryabook/Firebase/FirebaseEvents.dart';
 import 'package:marryabook/Models/EventModel.dart';
 
 import '../Models/PersonModel.dart';
+import '../global.dart';
 
 class AppointmentEditor extends StatefulWidget {
   AppointmentEditor({super.key, required this.newEvent});
@@ -21,10 +23,12 @@ class AppointmentEditorState extends State<AppointmentEditor> {
   late DateTime startDate = widget.newEvent.from;
   late String eventDescription = widget.newEvent.description;
   late bool isAllDay = widget.newEvent.isAllDay;
+  late List<dynamic>? ids = widget.newEvent.ids;
   EventType eventType = EventType.other;
   List<Person> addedPeople = [];
   Event? _selectedAppointment;
   List<Event> events = [];
+  Person? selectedPerson;
 
   // DateTime startDate = widget.newEvent.from;
   // DateTime endDate = startDate.add(const Duration(minutes: 60));
@@ -37,13 +41,22 @@ class AppointmentEditorState extends State<AppointmentEditor> {
 
   @override
   void initState() {
+    if(ids != null) {
+      for(var value in personList) {
+        if (ids?[0] == value.id) {
+          selectedPerson = value;
+          break;
+        }
+      }
+
+    }
     // startDate = widget.newEvent.from;
     // endDate = widget.newEvent.from.add(const Duration(minutes: 60));
     // _addResourceDetails();
     // _employeeCollection = <CalendarResource>[];
     // _addResources();
     // _events = DataSource(getMeetingDetails(),_employeeCollection);
-    _selectedAppointment = null;
+    // _selectedAppointment = null;
     // _selectedColorIndex = 0;
     // _selectedTimeZoneIndex = 0;
     // _selectedResourceIndex = 0;
@@ -68,6 +81,7 @@ class AppointmentEditorState extends State<AppointmentEditor> {
   Widget _getAppointmentEditor(BuildContext context) {
     print(widget.newEvent.toJson());
     print(eventName);
+    print(eventDescription ?? "NO EVENT DESC");
 
     // DateTime endDate = startDate.add(const Duration(minutes: 60));
     return Container(
@@ -367,6 +381,25 @@ class AppointmentEditorState extends State<AppointmentEditor> {
               height: 1.0,
               thickness: 1,
             ),
+            ListTile(
+              contentPadding: EdgeInsets.all(5),
+              leading: const Icon(
+                Icons.person,
+                color: Colors.black87,
+              ),
+              title: Text(selectedPerson == null ? "Add a Person" : selectedPerson!.name),
+              onTap: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const PersonPicker()),
+                );
+                setState(() {
+                  selectedPerson = result;
+                });
+
+                print(result.toJson());
+              },
+            ),
           ],
         ));
   }
@@ -407,22 +440,30 @@ class AppointmentEditorState extends State<AppointmentEditor> {
                       DateTime startDate = widget.newEvent.from;
                       DateTime endDate = startDate.add(const Duration(minutes: 60));
 
-                      events.add(Event(
-                          from: startDate,
-                          to: endDate,
-                          color: Colors.blue.value,
-                          parentUser: 'tim',
-                          // startTimeZone: _selectedTimeZoneIndex == 0
-                          //     ? ''
-                          //     : _timeZoneCollection[_selectedTimeZoneIndex],
-                          // endTimeZone: _selectedTimeZoneIndex == 0
-                          //     ? ''
-                          //     : _timeZoneCollection[_selectedTimeZoneIndex],
-                          description: eventDescription,
-                          isAllDay: isAllDay,
-                          eventName: eventName == '' ? '(No title)' : eventName,
-                          ids: <String>[]
-                      ));
+                      Event eventToAdd = Event(from: startDate, to: endDate, parentUser: 'timothy');
+                      eventToAdd.isAllDay = false;
+                      eventToAdd.color = Colors.amber.value;
+                      eventToAdd.description = eventDescription;
+                      eventToAdd.eventName = eventName == '' ? '(No title)' : eventName;
+                      eventToAdd.ids = selectedPerson != null ? [selectedPerson!.id] : [];
+
+                      events.add(eventToAdd);
+                      // events.add(Event(
+                      //     from: startDate,
+                      //     to: endDate,
+                      //     color: Colors.blue.value,
+                      //     parentUser: 'tim',
+                      //     // startTimeZone: _selectedTimeZoneIndex == 0
+                      //     //     ? ''
+                      //     //     : _timeZoneCollection[_selectedTimeZoneIndex],
+                      //     // endTimeZone: _selectedTimeZoneIndex == 0
+                      //     //     ? ''
+                      //     //     : _timeZoneCollection[_selectedTimeZoneIndex],
+                      //     description: eventDescription,
+                      //     isAllDay: isAllDay,
+                      //     eventName: eventName == '' ? '(No title)' : eventName,
+                      //     ids: <String>[selectedPerson?.id ?? ""]
+                      // ));
 
                       // events.add(events[0]);
                       addEvent(events[0]);
