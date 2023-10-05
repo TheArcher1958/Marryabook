@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'SplashScreen.dart';
 import 'home.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -19,6 +20,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Marryabook',
+
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const SplashScreen(),
+        '/home': (context) => const MBHomePage(title: 'Marryabook'),
+      },
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -38,7 +45,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MBHomePage(title: "Marryabook"),
+      // home: const SplashScreen(),
+      // home: const MBHomePage(title: "Marryabook"),
     );
   }
 }

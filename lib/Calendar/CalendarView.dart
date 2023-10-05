@@ -5,6 +5,8 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:marryabook/Calendar/AppointmentEditor.dart';
 import 'package:marryabook/Models/EventModel.dart';
 
+import '../global.dart';
+
 class MBCalendar extends StatefulWidget {
   const MBCalendar({super.key});
 
@@ -182,10 +184,9 @@ _AppointmentDataSource _getCalendarDataSource(snapshot) {
   if (snapshot.data != null) {
     snapshot.data!.docs.forEach((document) {
       Map<String, dynamic> fireEvent = document.data()! as Map<String, dynamic>;
-      // print(fireEvent);
       events.add(Event.fromFirestore(fireEvent, document.reference.id));
-      print(events.length);
     });
+    eventList = events;
   }
 
   return _AppointmentDataSource(events);

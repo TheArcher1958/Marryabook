@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:marryabook/Models/PersonModel.dart';
 import 'package:marryabook/Firebase/FirebasePeopleController.dart';
 import 'package:marryabook/People/CreatePersonView.dart';
-import 'package:marryabook/People/PersonDetailView.dart';
+import 'package:marryabook/People/PersonDetailTabController.dart';
 import 'package:marryabook/People/PersonListTile.dart';
 import 'package:marryabook/global.dart';
 

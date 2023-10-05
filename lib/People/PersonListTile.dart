@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../Models/PersonModel.dart';
-import 'PersonDetailView.dart';
+import 'PersonDetailTabController.dart';
 
 class PersonListTile extends StatelessWidget {
   const PersonListTile({super.key, required this.person});
